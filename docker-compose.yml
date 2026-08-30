@@ -1,0 +1,24 @@
+# Optional. SQLite (a single file, no service to run) is the default
+# store — see shared/config.py. Only bring this up if you've deliberately
+# switched DATABASE_URL to Postgres: real concurrent write load, or
+# running web/ and worker/ as separate containers that don't share a
+# filesystem/volume. See README.md's "Self-hosting" section.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: watch
+      POSTGRES_PASSWORD: watch
+      POSTGRES_DB: watch
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U watch"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:

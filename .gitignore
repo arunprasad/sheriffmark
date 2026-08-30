@@ -1,0 +1,22 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.env
+.env.*
+!.env.example
+
+# Default SQLite datastore (see shared/config.py) and its WAL sidecar files
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+node_modules/
+web/frontend/dist/
+.DS_Store
+
+# scripts/build.sh's output (the sheriffmark wheel/sdist)
+/dist/

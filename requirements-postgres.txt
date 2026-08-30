@@ -1,0 +1,8 @@
+# Only needed when DATABASE_URL points at Postgres instead of the
+# default SQLite file (see shared/config.py) — SQLite's driver is
+# Python's own stdlib `sqlite3`, nothing to install for it. Switch to
+# Postgres once you actually need it: real concurrent write load, or
+# running web/ and worker/ as separate containers that don't share a
+# filesystem/volume (SQLite can't cover that at all). See README.md's
+# "Self-hosting" section.
+psycopg[binary]

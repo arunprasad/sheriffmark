@@ -1,0 +1,15 @@
+fastapi
+python-multipart
+uvicorn[standard]
+sqlalchemy>=2.0
+alembic
+pydantic-settings
+pydantic[email]
+dnstwist
+dnspython
+requests
+pyjwt[crypto]
+bcrypt
+beautifulsoup4
+scrapy>=2.13
+reportlab

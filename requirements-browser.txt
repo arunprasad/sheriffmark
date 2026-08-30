@@ -1,0 +1,11 @@
+# Only needed for core/browser_crawler.py's SPA rendering fallback
+# (triggered when core/spa_detection.py flags a domain as client-
+# rendered). Kept separate from requirements.txt because Playwright
+# needs its own Chromium download on top of the pip package — real
+# weight a deployment that never sees SPA-flagged domains shouldn't
+# have to carry. See web/Dockerfile / worker/Dockerfile for how to
+# opt in.
+playwright
+
+# After installing this file, also run:
+#   playwright install --with-deps chromium

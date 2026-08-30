@@ -1,0 +1,10 @@
+# Only needed for core/visual_similarity.py (screenshot capture +
+# comparison against user-uploaded reference images). Kept
+# separate from requirements.txt for the same reason as
+# requirements-browser.txt / requirements-saml.txt: opencv-python-headless
+# alone is a ~60-90MB wheel, real weight a deployment that never uses
+# visual similarity shouldn't have to carry. Also needs
+# requirements-browser.txt (Playwright) installed for actual screenshot
+# capture — this file alone only gets you the comparison functions.
+imagehash
+opencv-python-headless

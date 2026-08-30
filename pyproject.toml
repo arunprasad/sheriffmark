@@ -1,0 +1,92 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sheriffmark"
+version = "0.1.0"
+description = "Open-source brand-protection / typosquat monitoring — self-hosted, AGPL-3.0."
+readme = "README.md"
+license = "AGPL-3.0-or-later"
+requires-python = ">=3.12"
+# Kept in sync with requirements.txt by hand — duplicated rather than
+# read dynamically from it (no clean cross-format way to do that with
+# hatchling) because it changes rarely. If you edit one, edit the other.
+dependencies = [
+    "fastapi",
+    "python-multipart",
+    "uvicorn[standard]",
+    "sqlalchemy>=2.0",
+    "alembic",
+    "pydantic-settings",
+    "pydantic[email]",
+    "dnstwist",
+    "dnspython",
+    "requests",
+    "pyjwt[crypto]",
+    "bcrypt",
+    "beautifulsoup4",
+    "scrapy>=2.13",
+    "reportlab",
+]
+
+# Mirrors requirements-postgres.txt / requirements-saml.txt /
+# requirements-browser.txt / requirements-visual.txt — same reasoning
+# as those files (see their own header comments): each is real added
+# weight (a native extension, a ~300MB Chromium download, a ~60-90MB
+# CV wheel) that most self-hosters don't need. `pip install
+# sheriffmark[postgres]`, `sheriffmark[saml]`, etc. pull them in.
+[project.optional-dependencies]
+postgres = ["psycopg[binary]"]
+saml = ["python3-saml"]
+browser = ["playwright"]
+visual = ["imagehash", "opencv-python-headless"]
+
+# `sheriffmark serve` — see sheriffmark/cli.py. This is the "download and
+# run" entry point: migrates the DB (SQLite by default, nothing to set
+# up) and starts one process serving the API and the built frontend on
+# one port. `pipx install sheriffmark` puts it on PATH in its own
+# isolated venv without the user managing one by hand.
+[project.scripts]
+sheriffmark = "sheriffmark.cli:main"
+
+# The frontend build (web/frontend/dist/) is gitignored — it's a build
+# artifact, not source — but must ship inside the wheel so `pip install`
+# gives you a working app with no Node toolchain required at install
+# time. force-include bypasses the normal VCS-based file selection for
+# exactly this case. See scripts/build.sh, which builds it before
+# `python -m build` runs.
+#
+# Both the wheel *and* sdist targets need this, not just wheel: `python
+# -m build`'s default flow builds the wheel FROM the sdist, so if only
+# the wheel target force-includes dist/, the sdist step drops it first
+# and the wheel build fails with "Forced include not found" (found by
+# actually running the full build, not just reasoning about it).
+[tool.hatch.build.targets.wheel]
+packages = ["core", "adapters", "shared", "web", "worker", "migrations", "sheriffmark"]
+# web/frontend/ is a Node project (node_modules alone is ~230MB) that
+# happens to live under a package hatchling would otherwise copy
+# wholesale — exclude the whole thing, then force-include just the
+# built dist/ back in below.
+exclude = ["web/frontend/**"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"web/frontend/dist" = "web/frontend/dist"
+
+[tool.hatch.build.targets.sdist]
+exclude = ["web/frontend/**"]
+
+[tool.hatch.build.targets.sdist.force-include]
+"web/frontend/dist" = "web/frontend/dist"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+# Legacy prototype, superseded by core/ — not worth reformatting now.
+extend-exclude = ["check_domains.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

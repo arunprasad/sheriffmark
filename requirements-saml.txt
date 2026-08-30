@@ -1,0 +1,8 @@
+# Only needed when AUTH_ENABLE_SAML=true. Kept separate from
+# requirements.txt because python3-saml pulls in `xmlsec`, a native
+# extension that needs the system libxmlsec1 (+ dev headers) present at
+# pip-install time — real weight a local-only or OIDC-only deployment
+# shouldn't have to carry. See web/Dockerfile for the matching apt
+# packages, and web/api/saml_auth.py for the lazy import that gives a
+# clear error instead of an ImportError if this file wasn't installed.
+python3-saml
