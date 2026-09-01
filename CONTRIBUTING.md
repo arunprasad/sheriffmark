@@ -9,6 +9,27 @@ For anything beyond a small fix (a new feature, a schema change, a
 behavior change), open an issue first to discuss the approach. Saves
 everyone the pain of a large PR going in a direction that doesn't fit.
 
+## Branching workflow
+
+Nothing lands on `main` directly — every change goes through a branch
+and a PR, squash-merged when it's done:
+
+```bash
+git checkout main && git pull
+git checkout -b <short-description>   # e.g. abuse-contact-lookup, fix-sqlite-timestamps
+# ... commit as many times as you want while iterating ...
+git push -u origin <short-description>
+```
+
+Then open a PR on GitHub and use **"Squash and merge"** once it's ready
+— `main`'s history is one commit per shipped change, not a replay of
+every intermediate commit made while getting there. `main` is also
+branch-protected: direct pushes are rejected, a PR is the only way in.
+
+Delete the branch after merging (GitHub's UI offers this on the PR page
+once it's merged) — there's no reason to keep it around once its commit
+is on `main`.
+
 ## Local development
 
 See [README.md](README.md#local-development) for getting the backend +
