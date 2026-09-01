@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SheriffMark — open-source brand-protection monitoring</title>
+<meta name="description" content="Open-source, self-hosted monitoring for typosquats, lookalikes, and combosquats of your brand — with evidence to support enforcement action." />
+<style>
+  :root {
+    --bg: #fafafa;
+    --bg-elevated: #ffffff;
+    --text: #18181b;
+    --text-muted: #52525b;
+    --border: #e4e4e7;
+    --accent: #18181b;
+    --accent-contrast: #ffffff;
+    --danger-bg: #fef2f2;
+    --danger-text: #b91c1c;
+    --danger-border: #fecaca;
+    --code-bg: #f4f4f5;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0c;
+      --bg-elevated: #151517;
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --border: #27272a;
+      --accent: #f4f4f5;
+      --accent-contrast: #0b0b0c;
+      --danger-bg: #2a1414;
+      --danger-text: #f87171;
+      --danger-border: #4c1d1d;
+      --code-bg: #1c1c1f;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  code, pre, .mono {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+  a { color: inherit; }
+
+  header.hero {
+    padding: 96px 0 64px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .badge-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    background: var(--bg-elevated);
+  }
+  h1.wordmark {
+    font-size: clamp(40px, 7vw, 64px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin: 0 0 16px;
+  }
+  .tagline {
+    font-size: clamp(17px, 2.4vw, 21px);
+    color: var(--text-muted);
+    max-width: 640px;
+    margin: 0 auto 36px;
+  }
+  .cta-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn-primary { background: var(--accent); color: var(--accent-contrast); border-color: var(--accent); }
+  .btn-secondary { background: var(--bg-elevated); color: var(--text); }
+
+  section { padding: 64px 0; }
+  section.alt { background: var(--bg-elevated); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  h2 {
+    font-size: clamp(24px, 3.5vw, 32px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+    text-align: center;
+  }
+  .section-sub {
+    text-align: center;
+    color: var(--text-muted);
+    max-width: 620px;
+    margin: 0 auto 44px;
+    font-size: 16px;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 28px;
+  }
+  .feature {
+    padding: 4px;
+  }
+  .feature h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .feature p {
+    color: var(--text-muted);
+    font-size: 14.5px;
+    margin: 0;
+  }
+  .feature .icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--code-bg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .shots {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .shot {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow);
+  }
+  .shot img { display: block; width: 100%; height: auto; }
+  .shot figcaption {
+    padding: 12px 18px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+  }
+  .shot-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+  @media (max-width: 640px) {
+    .shot-pair { grid-template-columns: 1fr; }
+  }
+
+  .quickstart pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    font-size: 13.5px;
+    overflow-x: auto;
+    line-height: 1.7;
+  }
+  .quickstart .note {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 16px;
+  }
+
+  .risk-note {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    color: var(--danger-text);
+    border-radius: 12px;
+    padding: 16px 18px;
+    font-size: 14px;
+    margin-top: 40px;
+  }
+  .risk-note strong { display: block; margin-bottom: 2px; }
+
+  footer {
+    padding: 48px 0 72px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  footer a { text-decoration: underline; text-underline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="badge-row">
+      <span class="pill">AGPL-3.0</span>
+      <span class="pill">Self-hosted</span>
+      <span class="pill">SQLite by default</span>
+    </div>
+    <h1 class="wordmark">SheriffMark</h1>
+    <p class="tagline">
+      Open-source monitoring for typosquats, lookalikes, and combosquats
+      of your brand — with evidence to support enforcement action.
+      Self-host it anywhere, or nowhere at all.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/arunprasad/sheriffmark">View on GitHub</a>
+      <a class="btn btn-secondary" href="https://github.com/arunprasad/sheriffmark#quickstart">Quickstart</a>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>What it watches for</h2>
+    <p class="section-sub">
+      New domains that could pass as yours — before someone else notices them first.
+    </p>
+    <div class="feature-grid">
+      <div class="feature">
+        <h3><span class="icon">🔍</span> Typosquat generation</h3>
+        <p>Homoglyphs, bitsquats, keyboard typos, TLD swaps, and combosquat
+        keywords — algorithmic candidate generation, checked against real
+        DNS/RDAP data.</p>
+      </div>
+      <div class="feature">
+        <h3><span class="icon">📡</span> Certificate Transparency</h3>
+        <p>Incremental CT-log polling catches domains the generator never
+        predicted — anything anyone actually deploys a certificate for.</p>
+      </div>
+      <div class="feature">
+        <h3><span class="icon">⚠️</span> Explainable risk scoring</h3>
+        <p>A transparent, weighted heuristic — every score comes with the
+        named factors behind it, not a black box.</p>
+      </div>
+      <div class="feature">
+        <h3><span class="icon">🚩</span> Abuse contact + blocklist enrichment</h3>
+        <p>RDAP/whois abuse contacts and public IP-blocklist hits recorded
+        automatically on every finding — recording only, never auto-filed.</p>
+      </div>
+      <div class="feature">
+        <h3><span class="icon">🧾</span> Evidence dossiers</h3>
+        <p>One-click PDF export: registration data, DNS records, screenshot,
+        risk factors, and the full incident timeline — ready to hand to
+        counsel or a registrar's abuse desk.</p>
+      </div>
+      <div class="feature">
+        <h3><span class="icon">🔔</span> Multi-channel alerts</h3>
+        <p>Email, Slack, Discord, or a generic webhook for SIEM ingestion —
+        pick whatever your team already watches.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2>What it looks like</h2>
+    <p class="section-sub">
+      A real console — brands, findings, and the full incident trail behind each one.
+    </p>
+    <div class="shots">
+      <figure class="shot">
+        <img src="screenshots/brand-list.png" alt="SheriffMark brand list showing a brand with unresolved findings" loading="lazy" />
+        <figcaption>Every brand you're watching, at a glance.</figcaption>
+      </figure>
+      <div class="shot-pair">
+        <figure class="shot">
+          <img src="screenshots/findings.png" alt="Findings table with risk scores, registrar, and a blocklist flag" loading="lazy" />
+          <figcaption>Findings ranked by risk, flagged when an IP turns up on a public blocklist.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="screenshots/finding-details.png" alt="Finding detail view with abuse contact, risk factors, and incident timeline" loading="lazy" />
+          <figcaption>Registration, abuse contact, and a full incident timeline per finding.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="quickstart">
+  <div class="wrap">
+    <h2>Download and run</h2>
+    <p class="section-sub">
+      One process, one port, SQLite by default — no Docker or database
+      service required to try it.
+    </p>
+    <pre><code>git clone https://github.com/arunprasad/sheriffmark.git
+cd sheriffmark
+pip install -r requirements-dev.txt   # gets `build`, for the step below
+./scripts/build.sh                    # builds the frontend, bundles it into a wheel
+pipx install dist/sheriffmark-*.whl
+sheriffmark serve</code></pre>
+    <p class="note">
+      That's it — the API and the built UI are served together on one
+      port, writing to a SQLite file in your current directory. See the
+      <a href="https://github.com/arunprasad/sheriffmark#self-hosting">README</a>
+      for Postgres, Docker, and multi-container setups.
+    </p>
+
+    <div class="risk-note">
+      <span>⚖️</span>
+      <div>
+        <strong>Recording, not action.</strong>
+        SheriffMark surfaces evidence — abuse contacts, blocklist hits,
+        registration details, PDF dossiers — for a human to act on. It
+        never drafts, auto-files, or sends anything to a registrar or
+        abuse desk on its own.
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Licensed <a href="https://github.com/arunprasad/sheriffmark/blob/main/LICENSE">AGPL-3.0</a>.
+    Contributions welcome — see the
+    <a href="https://github.com/arunprasad/sheriffmark">repository</a>.
+  </div>
+</footer>
+
+</body>
+</html>
