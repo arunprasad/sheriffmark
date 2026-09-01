@@ -321,17 +321,16 @@
       One process, one port, SQLite by default — no Docker or database
       service required to try it.
     </p>
-    <pre><code>git clone https://github.com/arunprasad/sheriffmark.git
-cd sheriffmark
-pip install -r requirements-dev.txt   # gets `build`, for the step below
-./scripts/build.sh                    # builds the frontend, bundles it into a wheel
-pipx install dist/sheriffmark-*.whl
+    <pre><code>pipx install sheriffmark   # or: pip install sheriffmark
 sheriffmark serve</code></pre>
     <p class="note">
-      That's it — the API and the built UI are served together on one
-      port, writing to a SQLite file in your current directory. See the
+      That's it — no clone, no build step. The API and the built UI are
+      served together on one port, writing to a SQLite file in your
+      current directory. Available on
+      <a href="https://pypi.org/project/sheriffmark/">PyPI</a>; see the
       <a href="https://github.com/arunprasad/sheriffmark#self-hosting">README</a>
-      for Postgres, Docker, and multi-container setups.
+      for Postgres, Docker, multi-container setups, and building from
+      source.
     </p>
 
     <div class="risk-note">
