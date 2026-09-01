@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Lets release.yml call this as a reusable workflow, re-running the
+  # exact same checks against the commit being released rather than
+  # duplicating them.
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet -r requirements-dev.txt -r requirements-postgres.txt
+      - run: ruff check .
+
+  # Both supported databases get their own job — SQLite is the default
+  # store (shared/config.py) so it needs the same coverage Postgres
+  # always had, and Postgres stays covered since it's still a fully
+  # supported, explicitly-configured option (DATABASE_URL). See
+  # shared/models.py's portable JSONBlob/StringList types and
+  # migrations/versions/ for how one migration history serves both.
+  test-sqlite:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "sqlite:////tmp/ci.db"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet -r requirements-dev.txt -r requirements-postgres.txt
+      - run: alembic upgrade head
+      - run: pytest -q
+
+  test-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: watch
+          POSTGRES_PASSWORD: watch
+          POSTGRES_DB: watch
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U watch"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: "postgresql+psycopg://watch:watch@localhost:5432/watch"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet -r requirements-dev.txt -r requirements-postgres.txt
+      - run: alembic upgrade head
+      - run: pytest -q

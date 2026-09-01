@@ -92,16 +92,26 @@ in `pyproject.toml` (`sheriffmark.__version__` in
 `sheriffmark/__init__.py` is a separate, cosmetic copy — bump both
 together).
 
+Publishing to PyPI is automated (`.github/workflows/release.yml`) via
+[Trusted Publishing](https://docs.pypi.org/trusted-publishers/) — no
+API token stored anywhere, PyPI and GitHub Actions verify each other
+directly via OIDC. The actual release checklist:
+
+1. Bump the version in both places above, PR it, merge it (normal
+   branch workflow — see "Branching workflow" above).
+2. `gh release create v0.1.1 --generate-notes` (or the GitHub UI:
+   Releases → Draft a new release) from the now-current `main`.
+3. That's it — publishing the release triggers the workflow: full test
+   suite against that exact commit, then build, then publish. Watch it
+   under the repo's Actions tab.
+
+To smoke-test a build locally before cutting a release, without
+touching PyPI at all:
+
 ```bash
 ./scripts/build.sh        # builds the frontend, bundles it into dist/*.whl + *.tar.gz
-pipx install --force dist/sheriffmark-*.whl   # smoke-test it locally first
-twine upload dist/*       # needs a PyPI account + API token — not automated in CI
+pipx install --force dist/sheriffmark-*.whl
 ```
-
-Nothing here auto-publishes on tag/merge — a release is a deliberate,
-manual `twine upload`, since it needs a PyPI token that only whoever
-owns the `sheriffmark` PyPI project should hold. `pip install build
-twine` if you don't have them.
 
 ## License
 
