@@ -22,28 +22,30 @@ SSO, any combination enabled per deployment.
 
 ## Quickstart
 
-The fastest way to try it: package it once, then run one command.
+[![PyPI](https://img.shields.io/pypi/v/sheriffmark.svg)](https://pypi.org/project/sheriffmark/)
+
+```bash
+pipx install sheriffmark   # or: pip install sheriffmark
+sheriffmark serve
+```
+
+That's it — one process on one port (`http://127.0.0.1:8000` by default
+— `--host 0.0.0.0` to accept non-local connections) serving both the
+API and the built UI, writing to a SQLite file in your current
+directory. No Docker, no Postgres, no separate frontend dev server, no
+clone, no build step. `sheriffmark --help` lists the rest (`migrate`,
+`worker`, `account create-account`/`reset-password`).
+
+Building from source instead (e.g. to try an unreleased change)?
 
 ```bash
 git clone https://github.com/arunprasad/sheriffmark.git
 cd sheriffmark
 pip install -r requirements-dev.txt   # gets `build`, for the step below
 ./scripts/build.sh                    # builds the frontend, bundles it into a wheel
-pipx install dist/sheriffmark-*.whl   # or: pip install dist/sheriffmark-*.whl
+pipx install dist/sheriffmark-*.whl
 sheriffmark serve
 ```
-
-That's one process on one port (`http://127.0.0.1:8000` by default —
-`--host 0.0.0.0` to accept non-local connections) serving both the API
-and the built UI, writing to a SQLite file in your current directory.
-No Docker, no Postgres, no separate frontend dev server. `sheriffmark
---help` lists the rest (`migrate`, `worker`, `account create-account`/
-`reset-password`).
-
-Once a release is published, this collapses further to `pipx install
-sheriffmark` with no clone or build step at all — see
-[CONTRIBUTING.md](CONTRIBUTING.md#releasing) for the maintainer-side
-publish step.
 
 Prefer Docker, or need Postgres? See "Self-hosting" below.
 
