@@ -1,0 +1,68 @@
+name: Release to PyPI
+
+# Fires when a GitHub Release is published — see CONTRIBUTING.md's
+# "Releasing" section for the actual release checklist (bump the
+# version, merge, then `gh release create`).
+on:
+  release:
+    types: [published]
+
+jobs:
+  # Re-run the full test suite against the exact commit being released,
+  # not just trust that CI on main once passed — a release can be cut
+  # from any tagged commit, and publishing untested code to PyPI isn't
+  # something a failed job after the fact can undo.
+  test:
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet build
+
+      # VITE_API_BASE_URL="" (not unset) is deliberate — see
+      # scripts/build.sh's own comment: Vite bakes env vars into the
+      # bundle at build time, and an unset shell var doesn't reliably
+      # override a committed .env.local's value the way an explicit
+      # empty string does.
+      - name: Build frontend
+        working-directory: web/frontend
+        run: |
+          npm ci
+          VITE_API_BASE_URL= npm run build
+
+      - name: Build Python package
+        run: python -m build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/sheriffmark
+    # Trusted Publishing (OIDC) — PyPI verifies this workflow's identity
+    # directly with GitHub, no stored API token to leak or rotate. See
+    # https://pypi.org/manage/account/publishing/ for the one-time PyPI-
+    # side setup (project name, owner, repo, workflow filename, and this
+    # same environment name all have to match exactly).
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
